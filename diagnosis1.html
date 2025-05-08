@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Diagnose the Blocky</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <style>
+    body {
+      background: url('your-background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card { border-radius: 15px; }
+    .diagnosis-image {
+      width: 160px; /* Changed from 128px to 160px */
+      height: 160px; /* Changed from 128px to 160px */
+      object-fit: contain;
+      margin: 20px auto;
+      display: block;
+      border-radius: 10px;
+      background: #f0f8ff;
+      padding: 10px;
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
+    }
+  .progress-container {
+  position: relative;
+  overflow: hidden;
+}
+
+
+    .choice-card {
+      background-color: #e8f5e9;
+      border: 2px solid transparent;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .choice-card:hover {
+      border: 2px solid #4CAF50;
+      background-color: #c8e6c9;
+    }
+    .choice-card input[type="radio"] { display: none; }
+    .choice-card.selected {
+      background-color: #a5d6a7;
+      border-color: #388e3c;
+    }
+    .select-diagnosis {
+      background: linear-gradient(to right, #e3f2fd, #bbdefb);
+      padding: 10px;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 18px;
+      color: #1565c0;
+      margin-bottom: 20px;
+    }
+    .bonus-box, .timer-box {
+      position: fixed;
+      bottom: 15px;
+      padding: 8px 15px;
+      background-color: #1976d2;
+      color: white;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    .bonus-box { right: 15px; }
+    .timer-box { left: 15px; }
+    .fixed-container { max-width: 1200px; width: 100%; }
+  </style>
+</head>
+<body>
+
+<div class="container fixed-container my-4">
+  <div class="row align-items-center">
+    <!-- Left Info Cards -->
+    <div class="col-md-4 mb-3">
+      <div class="card shadow mb-4 bg-light">
+        <div class="card-body">
+          <h5 class="card-title text-primary">🦴 OC Degeneration Biomarkers</h5>
+          <ul class="list-unstyled">
+            <li>• Strong Spine Bend</li>
+            <li>• Strong Bone Variation</li>
+            <li>• Tucked Head</li>
+            <li>• Mutation in Main Bones</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card shadow-sm bg-warning bg-opacity-25">
+        <div class="card-body">
+          <h5 class="card-title text-danger">⚠️ Warning</h5>
+          <p>OCDEgen can be fatal if not diagnosed early. Incorrect answers reduce your bonus. Treatment is costly and risky.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Diagnosis Panel -->
+    <div class="col-md-8">
+      <div class="card shadow-lg p-4 bg-white bg-opacity-75">
+     <div class="mb-4" style="height: 6px; background: #f0f0f0; border-radius: 10px;">
+  <div id="progressBar" style="height: 100%; width: 0%; background: #3b82f6; border-radius: 10px;"></div>
+</div>
+        <h5 class="text-center text-primary" id="patientId">Patient ID: Loading...</h5>
+        <img id="diagnosisImage" src="" alt="Diagnosis Image" class="diagnosis-image">
+        <div class="select-diagnosis">Select Your Diagnosis</div>
+        <form id="diagnosisForm">
+          <div class="row">
+            <div class="col-6">
+              <div class="choice-card" id="labelHealthy">
+                <input type="radio" name="diagnosis" value="Healthy" required> Healthy
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="choice-card" id="labelOCDEgen">
+                <input type="radio" name="diagnosis" value="OCDEgen"> OCDEgen
+              </div>
+            </div>
+          </div>
+        </form>
+        <div class="text-center mt-4">
+          <button class="btn btn-outline-secondary me-3" id="prevBtn" onclick="previousImage()">⏮️ Previous</button>
+          <button class="btn btn-primary" id="nextBtn" onclick="nextImage()">Next ⏭️</button>
+        </div>
+        <div class="text-center mt-3 text-muted" id="questionCounter">Question 0 of 20</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="bonus-box">💶 Bonus: 4,50€</div>
+<div class="timer-box">⏱️ Time: <span id="timer">0:00</span></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const studyId = "diagnosis_WithoutAI";
+  const images = [...Array(21).keys()].map(i => `img${i}.png`);
+  const userId = localStorage.getItem('userId') || "Unknown";
+
+  let currentIndex = 0;
+  let responses = [];
+
+  // Reset session data if reloaded before finishing
+  if (!sessionStorage.getItem("diagnosisStarted")) {
+    localStorage.removeItem(`${studyId}_responses`);
+    localStorage.removeItem(`${studyId}_currentIndex`);
+    sessionStorage.setItem("diagnosisStarted", "true");
+  }
+
+  currentIndex = parseInt(localStorage.getItem(`${studyId}_currentIndex`) || "0");
+  responses = JSON.parse(localStorage.getItem(`${studyId}_responses`) || "[]");
+
+  document.getElementById("patientId").textContent = "Patient ID: " + userId;
+  const img = document.getElementById('diagnosisImage');
+  const progressBar = document.getElementById('progressBar');
+  const questionCounter = document.getElementById('questionCounter');
+
+  function loadPage() {
+    img.src = images[currentIndex];
+    progressBar.style.width = `${((currentIndex + 1) / images.length) * 100}%`;
+    questionCounter.textContent = `Question ${currentIndex + 1} of 21`;
+    document.getElementById('prevBtn').disabled = currentIndex === 0;
+    document.getElementById('nextBtn').textContent = currentIndex >= images.length - 1 ? "Submit ✅" : "Next ⏭️";
+
+    // Restore previous selection
+    const prev = responses[currentIndex]?.answer;
+    if (prev) {
+      document.querySelectorAll('.choice-card').forEach(c => c.classList.remove('selected'));
+      const card = document.querySelector(`input[value="${prev}"]`)?.parentElement;
+      if (card) {
+        card.classList.add("selected");
+        card.querySelector("input").checked = true;
+      }
+    }
+  }
+
+  function nextImage() {
+    const selected = document.querySelector('input[name="diagnosis"]:checked');
+    if (!selected) return alert("Please select an option before continuing!");
+
+    responses[currentIndex] = { patientId: userId, answer: selected.value };
+    localStorage.setItem(`${studyId}_responses`, JSON.stringify(responses));
+
+    if (currentIndex >= images.length - 1) {
+      submitAnswers();
+    } else {
+      currentIndex++;
+      localStorage.setItem(`${studyId}_currentIndex`, currentIndex);
+      location.reload();
+    }
+  }
+
+  function previousImage() {
+    if (currentIndex > 0) {
+      currentIndex--;
+      localStorage.setItem(`${studyId}_currentIndex`, currentIndex);
+      location.reload();
+    }
+  }
+
+ function submitAnswers() {
+  fetch("http://localhost:3000/submit", {
+    method: "POST",
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      userId: userId,
+      studyId: "withoutAI",
+      responses: responses
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    alert("Submitted successfully!");
+    const tempUserId = userId;
+    localStorage.clear();
+    localStorage.setItem("userId", tempUserId);
+    window.location.href = "homepage.html";
+  })
+  .catch(err => {
+    console.error("Submission error:", err);
+  });
+}
+
+
+   loadPage();
+
+  document.querySelectorAll('.choice-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.choice-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      card.querySelector("input").checked = true;
+    });
+  });
+
+  let time = 0;
+  const timerElement = document.getElementById('timer');
+  setInterval(() => {
+    time++;
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+    timerElement.textContent = `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+  }, 1000);
+</script>
+</body>
+</html>

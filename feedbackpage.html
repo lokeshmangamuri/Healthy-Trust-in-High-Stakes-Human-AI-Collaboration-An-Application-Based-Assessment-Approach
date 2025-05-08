@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FeedBack</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #f0faff, #e3f2fd);
+      background-attachment: fixed;
+      color: #333;
+      padding: 30px 15px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+    }
+
+    h2.title {
+      text-align: center;
+      color: #0d47a1;
+      margin-bottom: 20px;
+    }
+
+    .feedback-item {
+      background: #ffffffdd;
+      padding: 15px 20px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      border-left: 5px solid #2196f3;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      transition: transform 0.3s ease;
+      position: relative;
+    }
+
+    .feedback-item:hover {
+      transform: translateY(-2px);
+    }
+
+    .feedback-item span {
+      display: block;
+      font-weight: bold;
+      color: #0d47a1;
+      margin-bottom: 6px;
+    }
+
+    .feedback-actions {
+      display: flex;
+      gap: 15px;
+      margin-top: 10px;
+      align-items: center;
+    }
+
+    .feedback-actions button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      transition: transform 0.2s ease;
+    }
+
+    .feedback-actions button:hover {
+      transform: scale(1.2);
+    }
+
+    .feedback-card {
+      background: #e3f2fd;
+      border: 2px dashed #64b5f6;
+      padding: 25px 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      margin-top: 30px;
+    }
+
+    .feedback-card h3 {
+      margin-bottom: 10px;
+      color: #1565c0;
+      text-align: center;
+    }
+
+    #userIdDisplay {
+      margin-bottom: 12px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #1a237e;
+      text-align: center;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      padding: 10px;
+      border: 1px solid #90caf9;
+      border-radius: 8px;
+      resize: none;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+
+    button.submit-btn {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button.submit-btn:hover {
+      background-color: #0d47a1;
+    }
+
+    @media (max-width: 600px) {
+      textarea {
+        height: 80px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2 class="title">🗳️ FeedBack</h2>
+
+    <!-- Display Feedbacks -->
+    <div id="feedbackList"></div>
+
+    <!-- Add Feedback Card -->
+    <div class="feedback-card">
+      <h3>💬 Add Your Feedback</h3>
+      <div id="userIdDisplay">ID: Loading...</div>
+      <textarea id="feedbackText" placeholder="Write your feedback here..."></textarea>
+      <div style="text-align:center;">
+        <button class="submit-btn" onclick="submitFeedback()">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const userId = localStorage.getItem("userId");
+    const userDisplay = document.getElementById("userIdDisplay");
+    const feedbackList = document.getElementById("feedbackList");
+    const feedbackInput = document.getElementById("feedbackText");
+
+    if (userId) {
+      userDisplay.textContent = "ID: " + userId;
+    } else {
+      userDisplay.textContent = "ID: Not Found";
+    }
+
+    let allFeedbacks = JSON.parse(localStorage.getItem("feedbacks")) || [];
+
+    function saveFeedbacks() {
+      localStorage.setItem("feedbacks", JSON.stringify(allFeedbacks));
+    }
+
+    function displayFeedbacks() {
+      feedbackList.innerHTML = "";
+      allFeedbacks.forEach((entry, index) => {
+        const item = document.createElement("div");
+        item.className = "feedback-item";
+        item.innerHTML = `
+          <span>User ID: ${entry.id}</span>
+          ${entry.text}
+          <div class="feedback-actions">
+            <button onclick="likeFeedback(${index})">👍 <span>${entry.likes || 0}</span></button>
+            <button onclick="dislikeFeedback(${index})">👎 <span>${entry.dislikes || 0}</span></button>
+          </div>
+        `;
+        feedbackList.appendChild(item);
+      });
+    }
+
+    function submitFeedback() {
+      const feedback = feedbackInput.value.trim();
+      if (!feedback) {
+        alert("Please write something before submitting.");
+        return;
+      }
+
+      const newEntry = {
+        id: userId,
+        text: feedback,
+        likes: 0,
+        dislikes: 0
+      };
+
+      allFeedbacks.push(newEntry);
+      saveFeedbacks();
+      feedbackInput.value = "";
+      displayFeedbacks();
+    }
+
+    function likeFeedback(index) {
+      allFeedbacks[index].likes = (allFeedbacks[index].likes || 0) + 1;
+      saveFeedbacks();
+      displayFeedbacks();
+    }
+
+    function dislikeFeedback(index) {
+      allFeedbacks[index].dislikes = (allFeedbacks[index].dislikes || 0) + 1;
+      saveFeedbacks();
+      displayFeedbacks();
+    }
+
+    // Display existing feedbacks on page load
+    displayFeedbacks();
+  </script>
+</body>
+</html>

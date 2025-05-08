@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Diagnose the Blocky - Home</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <style>
+    body {
+      background: linear-gradient(to bottom, #f4f9ff, #d4eaff);
+      min-height: 100vh;
+      color: #000;
+      margin: 0;
+      padding: 0;
+    }
+
+    .top-bar {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .id-display {
+      font-weight: bold;
+      font-size: 16px;
+      background: #e9f2ff;
+      padding: 6px 10px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .carousel-container {
+      max-width: 1000px;
+      margin: 80px auto 40px;
+      padding: 0 20px;
+    }
+
+    .carousel-item img {
+      height: 350px;
+      width: 100%;
+      object-fit: cover;
+      border-radius: 12px;
+    }
+
+    .card-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      max-width: 1000px;
+      margin: 0 auto 50px;
+      padding: 0 20px;
+    }
+
+    .custom-card {
+      background-color: white;
+      color: #000;
+      border-radius: 15px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s;
+      font-size: 1.1rem;
+    }
+
+    .custom-card:hover {
+      transform: scale(1.03);
+      cursor: pointer;
+    }
+
+    .btn-custom {
+      padding: 5px 12px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: none;
+      transition: 0.3s;
+      cursor: pointer;
+    }
+
+    .btn-custom.help {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .btn-custom.help:hover {
+      background-color: #218838;
+    }
+
+    .btn-custom.signout {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .btn-custom.signout:hover {
+      background-color: #c82333;
+    }
+
+    footer {
+      background-color: #222;
+      color: #ccc;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Right ID + Buttons -->
+  <div class="top-bar">
+    <div class="id-display" id="userId">ID: </div>
+    <button class="btn-custom help" onclick="window.location.href='mailto:lokeshmangamuri@gmail.com'">Help</button>
+    <button class="btn-custom signout" onclick="signOut()">Sign Out</button>
+  </div>
+
+  <!-- Language Toggle -->
+ 
+
+  <!-- Typing Welcome Text -->
+  <div class="text-center mt-5">
+    <h2 id="typewriter" class="fw-bold text-primary"></h2>
+  </div>
+
+  <!-- Carousel -->
+  <div class="carousel-container">
+    <div id="featureCarousel" class="carousel slide" data-bs-ride="carousel">
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <img src="slide1.JPG" class="d-block w-100" alt="Slide 1">
+        </div>
+        <div class="carousel-item">
+          <img src="slide2.PNG" class="d-block w-100" alt="Slide 2">
+        </div>
+        <div class="carousel-item">
+          <img src="slide3.JPG" class="d-block w-100" alt="Slide 3">
+        </div>
+      </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#featureCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#featureCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Cards -->
+  <div class="card-container">
+    <div class="custom-card" onclick="window.location.href='diagnosis1.html'">🧠 Start Diagnosis (Without AI)</div>
+
+    <div class="custom-card"  onclick="window.location.href='diagnosis2.html'">🤖 Start Diagnosis (With AI Help)</div>
+    <div class="custom-card"onclick="window.location.href='graph.html'" >📈 Run Block Tests</div>
+    <div class="custom-card" onclick="window.location.href='feedbackpage.html'">📁 FeedBack</div>
+  </div>
+
+  <!-- Trust Meter Simulator -->
+  <div class="container my-5" style="max-width: 800px;">
+    <div class="bg-white p-4 shadow rounded">
+      <h5 class="mb-3">🔍 Trust Meter Simulator</h5>
+      <p>Imagine making a high-stakes decision with AI assistance. Adjust the slider to simulate your trust level in the AI's recommendation:</p>
+      <input type="range" class="form-range" min="0" max="100" id="trustSlider">
+      <p>Trust Level: <strong id="trustValue">50</strong>%</p>
+    </div>
+  </div>
+
+  <!-- About Section -->
+  <div class="container my-5">
+    <div class="bg-light p-4 border rounded-4 shadow-sm" style="max-width: 1000px; margin: auto;">
+      <h4 class="text-primary fw-bold mb-3">📘 About the BLOCKIES Project</h4>
+      <hr class="mb-4">
+
+      <p>🔍 <strong>BLOCKIES</strong> is an interactive and research-backed framework designed to study human trust in <strong>high-stakes Human-AI collaboration</strong>. This project simulates clinical decision-making tasks using visual cues from synthetic creatures known as “Blockies”.</p>
+
+      <p>🧪 Participants are asked to diagnose a fictional condition called <strong>OCDEGEN</strong> using AI recommendations powered by the MobileNetV2 deep learning model.</p>
+
+      <p>⚙️ The goal is to observe how users respond when the stakes are perceived as high vs low — through storytelling, incentives, and real-time decisions.</p>
+
+      <div class="mt-4">
+        <span class="badge bg-primary p-2">✅ Visual Diagnosis</span>
+        <span class="badge bg-success p-2">🔐 Trust Evaluation</span>
+        <span class="badge bg-info text-dark p-2">📈 AI Collaboration</span>
+      </div>
+
+      <p class="mt-4 text-muted" style="font-size: 0.95rem;">
+        Developed with research ethics and user engagement at the core. Funded under TRR 318 “Constructing Explainability”.
+      </p>
+    </div>
+  </div>
+
+<!-- Meet the Team Redirect -->
+
+
+<div class="text-center mb-4">
+  <a href="aboutus.html" class="btn btn-outline-primary">👨‍🔬 Meet the Team</a>
+</div>
+
+
+  <!-- Footer -->
+  <footer class="py-4 text-center mt-5">
+    <p class="mb-1">&copy; 2025 BLOCKIES Project, Bielefeld University</p>
+    <p class="mb-0">📧 Contact Researcher: <a href="mailto:djohnson@techfak.uni-bielefeld.de" class="text-info">David S. Johnson</a></p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const userId = localStorage.getItem("userId");
+    document.getElementById("userId").textContent = userId ? `ID: ${userId}` : "ID: Not Found";
+
+    function signOut() {
+      localStorage.removeItem("userId");
+      window.location.href = "loginpage.html";
+    }
+
+    // Typing Effect
+    const txt = "Welcome to BLOCKIES – Where AI Meets Human Trust.";
+    let i = 0;
+    function typeWriter() {
+      if (i < txt.length) {
+        document.getElementById("typewriter").innerHTML += txt.charAt(i);
+        i++;
+        setTimeout(typeWriter, 50);
+      }
+    }
+    typeWriter();
+
+    // Trust Slider
+    const trustSlider = document.getElementById("trustSlider");
+    const trustValue = document.getElementById("trustValue");
+    trustSlider.value = 50;
+    trustSlider.addEventListener("input", () => {
+      trustValue.textContent = trustSlider.value;
+    });
+  </script>
+</body>
+</html>
